@@ -30,10 +30,15 @@ data/all_tiles.txt:
 		else echo "$(DATA_TILES) is not an mbtiles source: you will need to create data/all_tiles.txt manually." && exit 1 ; \
 		fi
 
+# Store the number of desired tiles in a file, so we can update it to reflect missing tiles
+data/train_size.txt:
+	echo ${TRAIN_SIZE} > $@
+
+
 # Make a random sample from all_tiles.txt of TRAIN_SIZE tiles, possibly
 # 'overzooming' them to zoom=ZOOM_LEVEL
-data/sample.txt: data/all_tiles.txt
-	./sample $^ $(TRAIN_SIZE) $(ZOOM_LEVEL) > $@
+data/sample.txt: data/all_tiles.txt data/train_size.txt
+	./sample $< $(shell cat data/train_size.txt) $(ZOOM_LEVEL) > $@
 
 # Rasterize the data tiles to bitmaps where each pixel is colored according to
 # the class defined in CLASSES
